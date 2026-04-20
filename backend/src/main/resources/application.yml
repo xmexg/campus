@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/legal_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: 'Sqnhhy327'
+    password: '123456'
   servlet:
     multipart:
       max-file-size: 50MB
