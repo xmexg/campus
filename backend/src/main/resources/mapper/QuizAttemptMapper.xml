@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.legal.mapper.QuizAttemptMapper">
+
+    <resultMap id="BaseMap" type="com.campus.legal.entity.QuizAttempt">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="score" property="score"/>
+        <result column="total_questions" property="totalQuestions"/>
+        <result column="correct_count" property="correctCount"/>
+        <result column="duration_seconds" property="durationSeconds"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO quiz_attempt (user_id, score, total_questions, correct_count, duration_seconds)
+        VALUES (#{userId}, #{score}, #{totalQuestions}, #{correctCount}, #{durationSeconds})
+    </insert>
+
+    <!-- 取用户历史最高分参与排名 -->
+    <select id="ranking" resultType="com.campus.legal.dto.QuizRankRow">
+        SELECT u.id AS userId, u.nickname,
+               MAX(a.score) AS bestScore,
+               COUNT(a.id) AS attemptCount
+        FROM quiz_attempt a
+        JOIN sys_user u ON u.id = a.user_id
+        GROUP BY u.id, u.nickname
+        ORDER BY bestScore DESC, attemptCount ASC
+        LIMIT #{limit}
+    </select>
+
+    <select id="statsSummary" resultType="com.campus.legal.dto.QuizStatSummary">
+        SELECT
+            COUNT(*) AS totalAttempts,
+            AVG(score) AS avgScore,
+            AVG(correct_count * 1.0 / NULLIF(total_questions, 0)) AS avgCorrectRate,
+            COUNT(DISTINCT user_id) AS distinctUsers
+        FROM quiz_attempt
+    </select>
+
+    <select id="listRecentAttempts" resultType="com.campus.legal.dto.QuizAttemptAdminVO">
+        SELECT a.id, a.user_id AS userId, u.nickname AS nickname, a.score, a.total_questions AS totalQuestions,
+               a.correct_count AS correctCount, a.duration_seconds AS durationSeconds, a.created_at AS createdAt
+        FROM quiz_attempt a
+        JOIN sys_user u ON u.id = a.user_id
+        ORDER BY a.id DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

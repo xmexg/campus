@@ -1,0 +1,1 @@
+function s(i){if(i==null||i==="")return"";const t=String(i).trim();if(/^https?:\/\//i.test(t))return t;let r=t.startsWith("/")?t:`/${t}`;return r.startsWith("/api/")?r:r.startsWith("/uploads/")?`/api${r}`:r}export{s as r};

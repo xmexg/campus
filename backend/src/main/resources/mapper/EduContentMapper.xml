@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.legal.mapper.EduContentMapper">
+
+    <resultMap id="BaseMap" type="com.campus.legal.entity.EduContent">
+        <id column="id" property="id"/>
+        <result column="content_type" property="contentType"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="body" property="body"/>
+        <result column="video_url" property="videoUrl"/>
+        <result column="cover_url" property="coverUrl"/>
+        <result column="category" property="category"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="published" property="published"/>
+        <result column="submit_status" property="submitStatus"/>
+        <result column="submit_audit_remark" property="submitAuditRemark"/>
+        <result column="creator_id" property="creatorId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+
+    <select id="findById" resultMap="BaseMap">
+        SELECT * FROM edu_content WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO edu_content (content_type, title, summary, body, video_url, cover_url, category, view_count, published,
+            submit_status, creator_id)
+        VALUES (#{contentType}, #{title}, #{summary}, #{body}, #{videoUrl}, #{coverUrl}, #{category}, #{viewCount}, #{published},
+            #{submitStatus}, #{creatorId})
+    </insert>
+
+    <update id="update">
+        UPDATE edu_content
+        SET content_type = #{contentType}, title = #{title}, summary = #{summary}, body = #{body},
+            video_url = #{videoUrl}, cover_url = #{coverUrl}, category = #{category}, published = #{published},
+            submit_status = #{submitStatus}, submit_audit_remark = #{submitAuditRemark}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM edu_content WHERE id = #{id}
+    </delete>
+
+    <update id="incrementView">
+        UPDATE edu_content SET view_count = view_count + 1 WHERE id = #{id}
+    </update>
+
+    <select id="search" resultMap="BaseMap">
+        SELECT * FROM edu_content
+        <where>
+            <if test="onlyPublished != null and onlyPublished == true">
+                AND published = 1 AND submit_status = 'PUBLISHED'
+            </if>
+            <if test="contentType != null and contentType != ''">AND content_type = #{contentType}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR summary LIKE CONCAT('%', #{keyword}, '%')
+                OR body LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY updated_at DESC
+    </select>
+
+    <select id="listPendingSubmit" resultMap="BaseMap">
+        SELECT * FROM edu_content WHERE submit_status = 'PENDING' ORDER BY id DESC
+    </select>
+
+    <select id="statsViewsByType" resultType="com.campus.legal.dto.ContentViewStatRow">
+        SELECT content_type AS contentType, COALESCE(SUM(view_count), 0) AS totalViews
+        FROM edu_content WHERE published = 1 GROUP BY content_type
+    </select>
+</mapper>

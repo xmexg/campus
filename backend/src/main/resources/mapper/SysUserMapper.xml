@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.legal.mapper.SysUserMapper">
+
+    <resultMap id="BaseMap" type="com.campus.legal.entity.SysUser">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <result column="role" property="role"/>
+        <result column="status" property="status"/>
+        <result column="identity_audit_status" property="identityAuditStatus"/>
+        <result column="identity_audit_remark" property="identityAuditRemark"/>
+        <result column="teacher_cert_url" property="teacherCertUrl"/>
+        <result column="teacher_audit_status" property="teacherAuditStatus"/>
+        <result column="teacher_audit_remark" property="teacherAuditRemark"/>
+        <result column="teacher_intro" property="teacherIntro"/>
+        <result column="teacher_material_url" property="teacherMaterialUrl"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="BaseMap">
+        SELECT * FROM sys_user WHERE username = #{username}
+    </select>
+
+    <select id="findById" resultMap="BaseMap">
+        SELECT * FROM sys_user WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_user (username, password, nickname, phone, role, status, identity_audit_status, teacher_audit_status)
+        VALUES (#{username}, #{password}, #{nickname}, #{phone}, #{role}, #{status}, #{identityAuditStatus}, #{teacherAuditStatus})
+    </insert>
+
+    <update id="updateProfile">
+        UPDATE sys_user
+        SET nickname = #{nickname}, phone = #{phone}, avatar_url = #{avatarUrl}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE sys_user SET password = #{password}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateIdentityAudit">
+        UPDATE sys_user SET identity_audit_status = #{status}, identity_audit_remark = #{remark}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateTeacherAudit">
+        UPDATE sys_user
+        SET teacher_audit_status = #{status}, teacher_audit_remark = #{remark},
+            role = #{newRole}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateTeacherInfo">
+        UPDATE sys_user
+        SET teacher_intro = #{teacherIntro}, teacher_material_url = #{teacherMaterialUrl}, teacher_cert_url = #{teacherCertUrl},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="listPendingIdentity" resultMap="BaseMap">
+        SELECT * FROM sys_user WHERE identity_audit_status = 'PENDING' ORDER BY id DESC
+    </select>
+
+    <select id="listPendingTeacher" resultMap="BaseMap">
+        SELECT * FROM sys_user WHERE teacher_audit_status = 'PENDING' ORDER BY id DESC
+    </select>
+
+    <select id="listAll" resultMap="BaseMap">
+        SELECT * FROM sys_user
+        <where>
+            <if test="role != null and role != ''">AND role = #{role}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <update id="updateByAdmin">
+        UPDATE sys_user
+        SET nickname = #{nickname}, phone = #{phone}, role = #{role}, status = #{status},
+            avatar_url = #{avatarUrl}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>
