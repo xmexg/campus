@@ -92,4 +92,21 @@
         </where>
         ORDER BY p.id DESC
     </select>
+
+    <select id="countAllPosts" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM forum_post
+    </select>
+
+    <select id="recent7DayPostCounts" resultType="com.campus.legal.dto.DateCountRow">
+        SELECT DATE_FORMAT(t.dayDate, '%m-%d') AS dateLabel,
+               t.totalCount AS totalCount
+        FROM (
+            SELECT DATE(created_at) AS dayDate,
+                   COUNT(*) AS totalCount
+            FROM forum_post
+            WHERE created_at &gt;= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            GROUP BY DATE(created_at)
+        ) t
+        ORDER BY t.dayDate
+    </select>
 </mapper>

@@ -71,4 +71,31 @@
         SELECT content_type AS contentType, COALESCE(SUM(view_count), 0) AS totalViews
         FROM edu_content WHERE published = 1 GROUP BY content_type
     </select>
+
+    <select id="countPublishedContents" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM edu_content WHERE published = 1
+    </select>
+
+    <select id="sumPublishedViews" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(view_count), 0) FROM edu_content WHERE published = 1
+    </select>
+
+    <select id="statsByType" resultType="com.campus.legal.dto.ContentTypeStatRow">
+        SELECT content_type AS contentType,
+               COUNT(*) AS contentCount,
+               COALESCE(SUM(view_count), 0) AS totalViews
+        FROM edu_content
+        WHERE published = 1
+        GROUP BY content_type
+        ORDER BY content_type
+    </select>
+
+    <select id="statsViewsByCategory" resultType="com.campus.legal.dto.CategoryViewStatRow">
+        SELECT IFNULL(NULLIF(category, ''), '未分类') AS category,
+               COALESCE(SUM(view_count), 0) AS totalViews
+        FROM edu_content
+        WHERE published = 1
+        GROUP BY IFNULL(NULLIF(category, ''), '未分类')
+        ORDER BY totalViews DESC
+    </select>
 </mapper>

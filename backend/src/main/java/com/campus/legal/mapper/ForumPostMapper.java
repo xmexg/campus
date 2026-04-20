@@ -1,5 +1,6 @@
 package com.campus.legal.mapper;
 
+import com.campus.legal.dto.DateCountRow;
 import com.campus.legal.dto.ForumPostVO;
 import com.campus.legal.entity.ForumPost;
 import org.apache.ibatis.annotations.Param;
@@ -29,4 +30,8 @@ public interface ForumPostMapper {
 
     /** 管理端：全部帖子，可筛选状态与关键词 */
     List<ForumPostVO> listAllForMod(@Param("keyword") String keyword, @Param("auditStatus") String auditStatus);
+
+    Long countAllPosts();
+
+    List<DateCountRow> recent7DayPostCounts();
 }

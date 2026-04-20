@@ -9,6 +9,7 @@ import {
   House,
   School,
   Setting,
+  PieChart,
   Trophy,
   User,
   UserFilled,
@@ -93,6 +94,10 @@ const roleLabel = computed(() => {
             <el-menu-item index="/admin/settings">
               <el-icon><Setting /></el-icon>
               <template #title>系统设置</template>
+            </el-menu-item>
+            <el-menu-item index="/admin/analytics">
+              <el-icon><PieChart /></el-icon>
+              <template #title>数据统计</template>
             </el-menu-item>
           </template>
         </el-menu>

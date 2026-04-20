@@ -1,5 +1,6 @@
 package com.campus.legal.mapper;
 
+import com.campus.legal.dto.DateCountRow;
 import com.campus.legal.entity.SysUser;
 import org.apache.ibatis.annotations.Param;
 
@@ -31,6 +32,9 @@ public interface SysUserMapper {
 
     int updateByAdmin(SysUser user);
 
-    // 获取nickname专用接口
-//    String
+    Long countAllUsers();
+
+    Long countByRole(@Param("role") String role);
+
+    List<DateCountRow> recent7DayNewUsers();
 }

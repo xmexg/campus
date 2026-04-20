@@ -1,5 +1,7 @@
 package com.campus.legal.mapper;
 
+import com.campus.legal.dto.CategoryViewStatRow;
+import com.campus.legal.dto.ContentTypeStatRow;
 import com.campus.legal.dto.ContentViewStatRow;
 import com.campus.legal.entity.EduContent;
 import org.apache.ibatis.annotations.Param;
@@ -24,4 +26,12 @@ public interface EduContentMapper {
     List<EduContent> listPendingSubmit();
 
     List<ContentViewStatRow> statsViewsByType();
+
+    Long countPublishedContents();
+
+    Long sumPublishedViews();
+
+    List<ContentTypeStatRow> statsByType();
+
+    List<CategoryViewStatRow> statsViewsByCategory();
 }

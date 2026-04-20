@@ -46,4 +46,18 @@
         ORDER BY a.id DESC
         LIMIT #{limit}
     </select>
+
+    <select id="statsScoreRange" resultType="com.campus.legal.dto.ScoreRangeStatRow">
+        SELECT CASE
+                   WHEN score &lt; 60 THEN '0-59'
+                   WHEN score &lt; 70 THEN '60-69'
+                   WHEN score &lt; 80 THEN '70-79'
+                   WHEN score &lt; 90 THEN '80-89'
+                   ELSE '90-100'
+               END AS scoreRange,
+               COUNT(*) AS totalCount
+        FROM quiz_attempt
+        GROUP BY scoreRange
+        ORDER BY MIN(score)
+    </select>
 </mapper>

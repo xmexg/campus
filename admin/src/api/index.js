@@ -51,6 +51,10 @@ export const quizApi = {
 
 export const statsApi = {
   overview: () => http.get('/stats/overview'),
+  userStat: () => http.get('/apistatuser'),
+  contentStat: () => http.get('/apistatcontent'),
+  forumStat: () => http.get('/apistat/fomum'),
+  quizStat: () => http.get('/statquiz'),
 }
 
 export const adminApi = {

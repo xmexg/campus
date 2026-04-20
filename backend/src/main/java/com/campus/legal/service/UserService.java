@@ -63,6 +63,12 @@ public class UserService {
         if (!"STUDENT".equals(u.getRole())) {
             throw new BusinessException("当前角色不可申请");
         }
+        if (!"APPROVED".equals(u.getIdentityAuditStatus())) {
+            throw new BusinessException("身份审核通过后才可申请教师认证");
+        }
+        if ("PENDING".equals(u.getTeacherAuditStatus())) {
+            throw new BusinessException("教师认证申请已提交，请等待审核");
+        }
         if (!StringUtils.hasText(certUrl)) {
             throw new BusinessException("请上传资格证材料");
         }
@@ -70,6 +76,7 @@ public class UserService {
         u.setTeacherIntro(intro);
         u.setTeacherAuditStatus("PENDING");
         sysUserMapper.updateTeacherInfo(u);
+        sysUserMapper.updateTeacherAudit(uid, "PENDING", null, "STUDENT");
     }
 
     @Transactional

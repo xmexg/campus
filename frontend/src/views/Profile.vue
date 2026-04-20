@@ -24,6 +24,10 @@ const roleMap = { STUDENT: '学生', TEACHER: '教师', ADMIN: '管理员' }
 
 const auditMap = { APPROVED: '已通过', PENDING: '待审核', REJECTED: '未通过' }
 
+const isStudent = computed(() => state.user?.role === 'STUDENT')
+const canApplyTeacher = computed(() => isStudent.value && state.user?.identityAuditStatus === 'APPROVED')
+const teacherApplyPending = computed(() => state.user?.teacherAuditStatus === 'PENDING')
+
 function auditLabel(s) {
   return auditMap[s] || s || '—'
 }
@@ -65,8 +69,17 @@ async function savePwd() {
 }
 
 async function applyTeacher() {
+  if (!canApplyTeacher.value) {
+    ElMessage.warning('身份审核通过后才可申请教师认证')
+    return
+  }
+  if (teacherApplyPending.value) {
+    ElMessage.info('教师认证申请已提交，请等待管理员审核')
+    return
+  }
   await userApi.applyTeacher({ certUrl: teacher.certUrl, intro: teacher.intro })
   await load()
+  ElMessage.success('教师认证申请提交成功，请等待管理员审核')
 }
 
 async function saveTeacher() {
@@ -194,33 +207,55 @@ onMounted(load)
           </el-form>
         </el-card>
 
-        <el-card v-if="state.user?.role === 'STUDENT'" shadow="never" class="ruoyi-panel-card mb16">
-          <template #header>
-            <span>申请教师入驻</span>
-          </template>
-          <el-alert type="info" :closable="false" class="mb16" title="上传执业资格证相关材料，管理员审核通过后将升级为教师。" />
-          <el-form label-width="100px">
-            <el-form-item label="简介">
-              <el-input v-model="teacher.intro" type="textarea" :rows="3" style="max-width: 480px" />
-            </el-form-item>
-            <el-form-item label="资格证">
-              <div class="upload-line">
-                <el-input v-model="teacher.certUrl" placeholder="上传后自动填入路径" class="upload-line-input upload-line-input--wide" />
-                <el-upload
-                  action="#"
-                  :show-file-list="false"
-                  :http-request="(opt) => customUpload(opt, 'cert')"
-                  accept="image/jpeg,image/png,image/gif,image/webp,.pdf,application/pdf"
-                >
-                  <el-button type="primary" :icon="Upload">上传文件</el-button>
-                </el-upload>
-              </div>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="applyTeacher">提交申请</el-button>
-            </el-form-item>
-          </el-form>
-        </el-card>
+        <template v-if="isStudent">
+          <el-card v-if="!canApplyTeacher" shadow="never" class="ruoyi-panel-card mb16">
+            <template #header>
+              <span>申请教师入驻</span>
+            </template>
+            <el-alert
+              type="warning"
+              :closable="false"
+              title="请先完成并通过身份认证，审核通过后可申请教师入驻。"
+            />
+          </el-card>
+
+          <el-card v-else shadow="never" class="ruoyi-panel-card mb16">
+            <template #header>
+              <span>申请教师入驻</span>
+            </template>
+            <el-alert type="info" :closable="false" class="mb16" title="上传执业资格证相关材料，管理员审核通过后将升级为教师。" />
+            <el-alert
+              v-if="teacherApplyPending"
+              type="success"
+              :closable="false"
+              class="mb16"
+              title="申请已提交，正在等待管理员审核。"
+            />
+            <el-form label-width="100px">
+              <el-form-item label="简介">
+                <el-input v-model="teacher.intro" type="textarea" :rows="3" style="max-width: 480px" />
+              </el-form-item>
+              <el-form-item label="资格证">
+                <div class="upload-line">
+                  <el-input v-model="teacher.certUrl" placeholder="上传后自动填入路径" class="upload-line-input upload-line-input--wide" />
+                  <el-upload
+                    action="#"
+                    :show-file-list="false"
+                    :http-request="(opt) => customUpload(opt, 'cert')"
+                    accept="image/jpeg,image/png,image/gif,image/webp,.pdf,application/pdf"
+                  >
+                    <el-button type="primary" :icon="Upload">上传文件</el-button>
+                  </el-upload>
+                </div>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" :disabled="teacherApplyPending" @click="applyTeacher">
+                  {{ teacherApplyPending ? '已提交审核' : '提交申请' }}
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </el-card>
+        </template>
 
         <template v-if="state.user?.role === 'TEACHER'">
           <el-card shadow="never" class="ruoyi-panel-card mb16">

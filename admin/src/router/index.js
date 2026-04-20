@@ -57,6 +57,12 @@ const routes = [
         component: () => import('../views/SystemSettings.vue'),
         meta: { title: '系统设置', roles: ['ADMIN'], activeMenu: '/admin/settings' },
       },
+      {
+        path: 'analytics',
+        name: 'consoleAnalytics',
+        component: () => import('../views/DataStats.vue'),
+        meta: { title: '数据统计', roles: ['ADMIN'], activeMenu: '/admin/analytics' },
+      },
       { path: 'stats', redirect: '/admin/home' },
       { path: 'questions', redirect: '/admin/quiz' },
       { path: 'forum-audit', redirect: '/admin/forum' },

@@ -30,4 +30,21 @@
     <delete id="deleteByPost">
         DELETE FROM forum_reply WHERE post_id = #{postId}
     </delete>
+
+    <select id="countAllReplies" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM forum_reply
+    </select>
+
+    <select id="recent7DayReplyCounts" resultType="com.campus.legal.dto.DateCountRow">
+        SELECT DATE_FORMAT(t.dayDate, '%m-%d') AS dateLabel,
+               t.totalCount AS totalCount
+        FROM (
+            SELECT DATE(created_at) AS dayDate,
+                   COUNT(*) AS totalCount
+            FROM forum_reply
+            WHERE created_at &gt;= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            GROUP BY DATE(created_at)
+        ) t
+        ORDER BY t.dayDate
+    </select>
 </mapper>

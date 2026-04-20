@@ -1,5 +1,6 @@
 package com.campus.legal.mapper;
 
+import com.campus.legal.dto.DateCountRow;
 import com.campus.legal.dto.ForumReplyVO;
 import com.campus.legal.entity.ForumReply;
 import org.apache.ibatis.annotations.Param;
@@ -14,4 +15,8 @@ public interface ForumReplyMapper {
     int delete(@Param("id") Long id);
 
     int deleteByPost(@Param("postId") Long postId);
+
+    Long countAllReplies();
+
+    List<DateCountRow> recent7DayReplyCounts();
 }
